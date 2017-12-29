@@ -1,0 +1,47 @@
+apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao'
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "com.hzh.green.dao.sample"
+        minSdkVersion 16
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        //配置butterKnife7.0.1
+        javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+//greenDao配置
+greendao {
+    schemaVersion 1
+    daoPackage 'com.hzh.green.dao.sample.db'
+    targetGenDir 'src/main/java'
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    //butterKnife
+    compile 'com.jakewharton:butterknife:7.0.1'
+    //greenDao
+    compile 'org.greenrobot:greendao:3.2.2'
+    //数据库加密
+    compile 'net.zetetic:android-database-sqlcipher:3.5.6'
+    //数据库升级帮助类库
+    compile 'com.github.yuweiguocn:GreenDaoUpgradeHelper:v2.0.1'
+    implementation 'com.android.support:design:27.0.2'
+}
