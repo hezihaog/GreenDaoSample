@@ -23,7 +23,7 @@ public class GreenDaoManager {
 
     private GreenDaoManager() {
         if (mInstance == null) {
-            MMCSQLiteOpenHelper openHelper = new MMCSQLiteOpenHelper(AppContext.getInstance(), DB_NAME);
+            SampleSQLiteOpenHelper openHelper = new SampleSQLiteOpenHelper(AppContext.getInstance(), DB_NAME);
             SQLiteDatabase db = openHelper.getWritableDatabase();
             mDaoMaster = new DaoMaster(db);
             mDaoSession = mDaoMaster.newSession();

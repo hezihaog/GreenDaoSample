@@ -5,8 +5,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.github.yuweiguocn.library.greendao.MigrationHelper;
+import com.hzh.green.dao.sample.db.CertificateInfoEntityDao;
 import com.hzh.green.dao.sample.db.DaoMaster;
-import com.hzh.green.dao.sample.db.UserDao;
+import com.hzh.green.dao.sample.db.PersonInfoEntityDao;
+import com.hzh.green.dao.sample.db.PersonMobileEntityDao;
 
 import org.greenrobot.greendao.database.Database;
 
@@ -19,14 +21,14 @@ import org.greenrobot.greendao.database.Database;
  * Email: hezihao@linghit.com
  */
 
-public class MMCSQLiteOpenHelper extends DaoMaster.OpenHelper {
-    private static final String TAG = MMCSQLiteOpenHelper.class.getSimpleName();
+public class SampleSQLiteOpenHelper extends DaoMaster.OpenHelper {
+    private static final String TAG = SampleSQLiteOpenHelper.class.getSimpleName();
 
-    public MMCSQLiteOpenHelper(Context context, String name) {
+    public SampleSQLiteOpenHelper(Context context, String name) {
         super(context, name);
     }
 
-    public MMCSQLiteOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory) {
+    public SampleSQLiteOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory) {
         super(context, name, factory);
     }
 
@@ -38,16 +40,9 @@ public class MMCSQLiteOpenHelper extends DaoMaster.OpenHelper {
             return;
         }
         Log.i(TAG, "数据库从" + oldVersion + "升级到 ::: " + newVersion + "版本");
-        switch (oldVersion) {
-            case 1:
-//                String sql = "";
-//                db.execSQL(sql);
-            case 2:
-            default:
-                break;
-        }
-
         //使用GreenDaoUpgradeHelper辅助类进行升级
-        MigrationHelper.migrate(db, UserDao.class);
+        MigrationHelper.migrate(db, PersonInfoEntityDao.class,
+                PersonMobileEntityDao.class,
+                CertificateInfoEntityDao.class);
     }
 }

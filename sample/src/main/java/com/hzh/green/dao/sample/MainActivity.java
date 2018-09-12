@@ -1,129 +1,130 @@
 package com.hzh.green.dao.sample;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.Button;
+import android.util.Log;
 import android.widget.Toast;
 
-import com.hzh.green.dao.sample.adater.MMCRecyclerViewAdapter;
-import com.hzh.green.dao.sample.db.UserDao;
-import com.hzh.green.dao.sample.entity.User;
-import com.hzh.green.dao.sample.util.GreenDaoManager;
+import com.hzh.green.dao.sample.db.aggr.AggrPersonController;
+import com.hzh.green.dao.sample.enums.CertificateTypeEnums;
+import com.hzh.green.dao.sample.enums.SexEnums;
+import com.hzh.green.dao.sample.model.dto.PersonInfoDTO;
+import com.hzh.green.dao.sample.model.vo.PersonInfoListVO;
+import com.hzh.green.dao.sample.util.RecyclerViewHelper;
+import com.hzh.green.dao.sample.viewbinder.PersonViewBinderViewBinder;
+import com.trello.rxlifecycle2.android.ActivityEvent;
+import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import me.drakeet.multitype.MultiTypeAdapter;
 
-public class MainActivity extends AppCompatActivity {
-    @Bind(R.id.add)
-    Button add;
-    @Bind(R.id.delete)
-    Button delete;
-    @Bind(R.id.query)
-    Button query;
-    @Bind(R.id.update)
-    Button update;
-    @Bind(R.id.recyclerView)
+public class MainActivity extends RxAppCompatActivity {
+    private static final String TAG = MainActivity.class.getSimpleName();
+
+    @Bind(R.id.swipe_refresh)
+    SwipeRefreshLayout swipeRefreshLayout;
+    @Bind(R.id.recycler_view)
     RecyclerView recyclerView;
 
-    private UserDao mUserDao;
-    private MMCRecyclerViewAdapter adapter;
-    private List<User> userList = new ArrayList<User>();
+    private RecyclerViewHelper mRecyclerViewHelper;
+    private boolean isEnsureCheckData = false;
+    private AggrPersonController mPersonController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        mUserDao = GreenDaoManager.getInstance().getDaoSession().getUserDao();
-        adapter = new MMCRecyclerViewAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getApplicationContext()));
+        MultiTypeAdapter adapter = new MultiTypeAdapter();
+        adapter.register(PersonInfoListVO.class, new PersonViewBinderViewBinder());
         recyclerView.setAdapter(adapter);
-        userList.addAll(mUserDao.loadAll());
-        adapter.setDataAndNotify(userList);
-    }
-
-    @OnClick({R.id.add, R.id.delete, R.id.query, R.id.update})
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.add:
-                add("Wally", 18, "i am wally");
-                break;
-            case R.id.delete:
-                delete("Wally");
-                break;
-            case R.id.query:
-                query("Wally");
-                break;
-            case R.id.update:
-                update("Wally", "hello green dao");
-                break;
-            default:
-                break;
-        }
-        adapter.setDataAndNotify(mUserDao.loadAll());
-    }
-
-    private void add(String userName, int age, String sign) {
-        //构建userId，为当前最后一个用户的id加1
-        List<User> allUserList = mUserDao.loadAll();
-        String userId = null;
-        if (allUserList.size() > 0) {
-            User lastUser = allUserList.get(allUserList.size() - 1);
-            userId = String.valueOf(Long.valueOf(lastUser.getUserId()) + 1);
-        } else {
-            userId = "0";
-        }
-        User user = new User(null, userId, userName, age, sign);
-        long insertId = mUserDao.insert(user);
-        if (insertId != -1) {
-            toast("新增一条用户信息 ::: " + userName);
-        } else {
-            toast("新增用户异常 ::: id为" + userId + " userName为 ::: " + userName);
-        }
-    }
-
-    private void delete(String userName) {
-        List<User> list = mUserDao.queryBuilder().where(UserDao.Properties.UserName.eq(userName)).list();
-        if (list != null && list.size() > 0) {
-            mUserDao.delete(list.get(0));
-            toast("删除用户名为 ::: " + userName + " 的用户");
-        } else {
-            toast("删除用户失败 ::: 没有找到用户名为 ::: " + userName + "的用户");
-        }
-    }
-
-    private void query(String userName) {
-        List<User> list = mUserDao.queryBuilder().where(UserDao.Properties.UserName.eq(userName)).list();
-        if (list != null && list.size() > 0) {
-            User user = list.get(0);
-            if (user != null) {
-                toast("查询到用户 --> " + userName + " ::: " + user.getUserName());
+        //加载更多加载监听
+        mRecyclerViewHelper = RecyclerViewHelper.create(swipeRefreshLayout, recyclerView, adapter, new RecyclerViewHelper.OnLoadListener() {
+            @Override
+            public void onSwipeRefresh(int page, boolean isFirst) {
+                loadData(page, true);
             }
-        } else {
-            toast("查询不到用户名为 ::: " + userName + "的用户");
-        }
+
+            @Override
+            public void onLoadMore(int page, boolean isFirst) {
+                loadData(page, false);
+            }
+        });
+        //初始化默认数据
+        mPersonController = new AggrPersonController();
+        mRecyclerViewHelper.startRefreshWithLoading();
     }
 
-    private void update(String userName, String newSign) {
-        List<User> list = mUserDao.queryBuilder().where(UserDao.Properties.UserName.eq(userName)).list();
-        if (list != null && list.size() > 0) {
-            User user = list.get(0);
-            user.setSign(newSign);
-            mUserDao.update(user);
-            toast("更新成功 ::: 用户名为 ::: " + userName + "的用户的 sign 更新为 ::: " + user.getSign());
-        } else {
-            toast("更新失败，查到不到用户名为 ::: " + userName + "的用户");
-        }
-    }
-
-    private void toast(String msg) {
-        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+    private void loadData(final int page, final boolean isRefresh) {
+        //默认每页的条数
+        final int pageSize = 20;
+        Disposable disposable = Observable.create(new ObservableOnSubscribe<List<PersonInfoListVO>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<PersonInfoListVO>> emitter) throws Exception {
+                if (!isEnsureCheckData) {
+                    boolean hasData = mPersonController.hasData();
+                    if (!hasData) {
+                        int size = 100;
+                        Log.d(TAG, ("本次插入" + size + "条数据 " + "插入开始..."));
+                        long start = System.currentTimeMillis();
+                        for (int i = 0; i < size; i++) {
+                            PersonInfoDTO dto = new PersonInfoDTO();
+                            dto.setPersonName("王小二" + i);
+                            dto.setSex(SexEnums.male.getCode());
+                            dto.setAge(18);
+                            //设置住户手机号
+                            dto.setMobiles(new String[]{"13812397891", "13027883271"});
+                            //设置住户身份证
+                            dto.setCertificateNo("440111199308126612");
+                            dto.setCertificateType(CertificateTypeEnums.IDENTITY.getCode());
+                            mPersonController.addPersonInfo(dto);
+                        }
+                        long end = System.currentTimeMillis();
+                        Log.d(TAG, ("本次插入" + size + "条数据 " + "插入结束...耗时：" + (end - start)));
+                    }
+                    isEnsureCheckData = true;
+                }
+                Log.d(TAG, ("查询开始..."));
+                long start = System.currentTimeMillis();
+                List<PersonInfoListVO> allPersonList = mPersonController.getAllPersonPageList(page, pageSize).getRecords();
+                long end = System.currentTimeMillis();
+                Log.d(TAG, ("查询结束...耗时：" + (end - start)));
+                emitter.onNext(allPersonList);
+                emitter.onComplete();
+            }
+        })
+                //绑定生命周期进行切断
+                .compose(this.<List<PersonInfoListVO>>bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<PersonInfoListVO>>() {
+                    @Override
+                    public void accept(List<PersonInfoListVO> personInfoVOList) throws Exception {
+                        boolean hasNext = true;
+                        if (personInfoVOList.size() < pageSize) {
+                            hasNext = false;
+                        }
+                        mRecyclerViewHelper.updateDataSource(isRefresh, personInfoVOList, hasNext);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Toast.makeText(MainActivity.this.getApplicationContext(), "哎呀，出错啦...", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "异常：" + throwable.getMessage());
+                    }
+                });
     }
 }
