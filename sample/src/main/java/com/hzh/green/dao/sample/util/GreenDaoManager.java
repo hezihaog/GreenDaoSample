@@ -3,8 +3,8 @@ package com.hzh.green.dao.sample.util;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.hzh.green.dao.sample.AppContext;
-import com.hzh.green.dao.sample.db.DaoMaster;
-import com.hzh.green.dao.sample.db.DaoSession;
+import com.hzh.green.dao.sample.model.entity.DaoMaster;
+import com.hzh.green.dao.sample.model.entity.DaoSession;
 
 /**
  * Package: com.hzh.green.dao.sample.util

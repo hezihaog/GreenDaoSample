@@ -2,10 +2,10 @@ package com.hzh.green.dao.sample.db.dao.impl;
 
 
 import com.hzh.green.dao.sample.common.model.vo.Page;
-import com.hzh.green.dao.sample.db.PersonInfoEntityDao;
 import com.hzh.green.dao.sample.db.dao.IPersonDao;
 import com.hzh.green.dao.sample.model.dto.PersonInfoDTO;
 import com.hzh.green.dao.sample.model.entity.PersonInfoEntity;
+import com.hzh.green.dao.sample.model.entity.PersonInfoEntityDao;
 import com.hzh.green.dao.sample.model.vo.PersonInfoListVO;
 import com.hzh.green.dao.sample.util.GreenDaoManager;
 import com.hzh.green.dao.sample.util.PageHelper;

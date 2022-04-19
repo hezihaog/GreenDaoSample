@@ -1,8 +1,8 @@
 package com.hzh.green.dao.sample.db.dao.impl;
-import com.hzh.green.dao.sample.db.CertificateInfoEntityDao;
 import com.hzh.green.dao.sample.db.dao.ICertificateInfoDao;
 import com.hzh.green.dao.sample.model.dto.PersonInfoDTO;
 import com.hzh.green.dao.sample.model.entity.CertificateInfoEntity;
+import com.hzh.green.dao.sample.model.entity.CertificateInfoEntityDao;
 import com.hzh.green.dao.sample.util.GreenDaoManager;
 import com.hzh.green.dao.sample.util.UUIDUtil;
 

@@ -28,8 +28,9 @@ android {
 //greenDao配置
 greendao {
     schemaVersion 1
-    daoPackage 'com.hzh.green.dao.sample.db'
-    targetGenDir 'src/main/java'
+    //指定生成的类的目录，默认生成在build目录中
+    //daoPackage 'com.hzh.green.dao.sample.db'
+    //targetGenDir 'src/main/java'
 }
 
 dependencies {

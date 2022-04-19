@@ -1,9 +1,9 @@
 package com.hzh.green.dao.sample.db.dao.impl;
 
-import com.hzh.green.dao.sample.db.PersonMobileEntityDao;
 import com.hzh.green.dao.sample.db.dao.IPersonMobileDao;
 import com.hzh.green.dao.sample.model.dto.PersonInfoDTO;
 import com.hzh.green.dao.sample.model.entity.PersonMobileEntity;
+import com.hzh.green.dao.sample.model.entity.PersonMobileEntityDao;
 import com.hzh.green.dao.sample.util.GreenDaoManager;
 import com.hzh.green.dao.sample.util.UUIDUtil;
 

@@ -5,10 +5,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.github.yuweiguocn.library.greendao.MigrationHelper;
-import com.hzh.green.dao.sample.db.CertificateInfoEntityDao;
-import com.hzh.green.dao.sample.db.DaoMaster;
-import com.hzh.green.dao.sample.db.PersonInfoEntityDao;
-import com.hzh.green.dao.sample.db.PersonMobileEntityDao;
+import com.hzh.green.dao.sample.model.entity.CertificateInfoEntityDao;
+import com.hzh.green.dao.sample.model.entity.DaoMaster;
+import com.hzh.green.dao.sample.model.entity.PersonInfoEntityDao;
+import com.hzh.green.dao.sample.model.entity.PersonMobileEntityDao;
 
 import org.greenrobot.greendao.database.Database;
 
