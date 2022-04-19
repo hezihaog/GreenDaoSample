@@ -45,14 +45,14 @@ dependencies {
     //greenDao
     implementation 'org.greenrobot:greendao:3.3.0'
     //数据库加密
-    implementation 'net.zetetic:android-database-sqlcipher:3.5.6'
+    implementation 'net.zetetic:android-database-sqlcipher:3.5.9'
     //数据库升级帮助类库
     compile 'io.github.yuweiguocn:GreenDaoUpgradeHelper:v2.2.1'
     implementation 'com.android.support:design:27.0.2'
     implementation 'me.drakeet.multitype:multitype:3.4.4'
     //rxJava
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.14'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation 'com.trello.rxlifecycle2:rxlifecycle-components:2.2.1'
     implementation 'com.trello.rxlifecycle2:rxlifecycle-navi:2.2.1'
 }
